@@ -1,4 +1,6 @@
-CREATE DATABASE biblioteca;
+CREATE DATABASE biblioteca 
+	CHARACTER SET utf8mb4 
+	COLLATE utf8mb4_general_ci;
 USE biblioteca;
 
 
@@ -40,8 +42,8 @@ CREATE TABLE personas (
 );
 
 CREATE TABLE soci (
-	persona_id INT PRIMARY KEY,
-	FOREIGN KEY (persona_id) REFERENCES personas (persona_id)
+	soci_id INT PRIMARY KEY,
+	FOREIGN KEY (soci_id) REFERENCES personas (persona_id)
 );
 
 CREATE TABLE administrador(
@@ -62,3 +64,4 @@ CREATE TABLE prestamos(
 	FOREIGN KEY (material_id) REFERENCES materiales (material_id)
 );
 
+DROP DATABASE biblioteca;
