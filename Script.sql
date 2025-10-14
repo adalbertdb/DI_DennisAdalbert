@@ -64,4 +64,50 @@ CREATE TABLE prestamos(
 	FOREIGN KEY (material_id) REFERENCES materiales (material_id)
 );
 
+-- TRIGGERS
+
+DELIMITER $$
+CREATE TRIGGER comprobarDisponibilidad
+BEFORE INSERT ON prestamos
+FOR EACH ROW
+BEGIN 
+	DECLARE disponibles INT;
+	SELECT n_ejemplares INTO disponibles
+	FROM materiales
+	WHERE material_id = NEW.material_id;
+
+	IF disponibles >=0 THEN
+		SIGNAL SQLSTATE "4500"
+			SET MESAGE_TEXT="NO QUEDAN EJEMPLARES DISPONIBLES PARA ESTE RECURSO";
+	END IF;
+END$$
+DELIMITER ;
+
+
+
+DELIMITER $$
+CREATE TRIGGER prestar_libro
+AFTER INSERT ON prestamos
+FOR EACH ROW 
+BEGIN 
+	UPDATE materiales
+	SET n_ejemplares = n_ejemplares -1
+	WHERE material_id = NEW.material_id;
+
+END$$
+DELIMITER ;
+
+DELIMITER $$
+CREATE TRIGGER devolver_libro
+AFTER UPDATE ON prestamos
+FOR EACH ROW 
+BEGIN 
+	IF OLD.fecha_devolucion IS NULL AND NEW.fecha_devolucion IS NOT NULL THEN
+		UPDATE materiales
+		SET n_ejemplares = n_ejemplares +1
+		WHERE material_id = NEW.material_id;
+	END IF
+END$$
+DELIMITER ;
+
 DROP DATABASE biblioteca;
