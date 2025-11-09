@@ -1,15 +1,4 @@
 services:
-  node:
-    image: "node:22"
-    user: "node"
-    working_dir: /home/node/app
-    environment:
-      - NODE_ENV=production
-    volumes:
-      - ./:/home/node/app
-    ports: # use if it is necessary to expose the container to the host machine
-      - "3000:3000"
-    command: ["npm", "start"]
   db:
     image: "mysql:8.4.3"
     environment:
@@ -21,5 +10,19 @@ services:
       - "3306"
     volumes:
       - "./db/script.sql:/docker-entrypoint-initdb.d/init.sql"
+
+  node:
+      depends_on:
+        - db
+      image: "node:22"
+      user: "node"
+      working_dir: /home/node/app
+      environment:
+        - NODE_ENV=production
+      volumes:
+        - ./:/home/node/app
+      ports: # use if it is necessary to expose the container to the host machine
+        - "3000:3000"
+      command: ["npm", "start"]      
 volumes:
   my-db:
